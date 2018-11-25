@@ -9,7 +9,7 @@ def center(window):
     window.move(qr.topLeft())
 """
 class WelcomeWindow(QWidget):
-    """ Optional welcome page """
+    """""" Optional welcome page """"""
     def __init__(self):
         super().__init__()
         # self.setWindowIcon(QIcon())
