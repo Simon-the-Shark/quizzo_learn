@@ -4,7 +4,7 @@ import os.path
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, \
-    QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit
+    QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox
 
 
 def center(window):
@@ -163,6 +163,10 @@ class NewTestWindow(QWidget):
         self.show()
 
     def load_ui(self):
+        back_button = QPushButton("<= WRÓĆ")
+        back_button.setStyleSheet("background-color: YellowGreen")
+        back_button.clicked.connect(self.back_button_act)
+
         add_button = QPushButton()
         add_button.setIcon(QIcon(os.path.join(os.pardir, "res", "add-icon.png")))
         add_button.setIconSize(QSize(100, 100))
@@ -175,13 +179,26 @@ class NewTestWindow(QWidget):
         vbox.addWidget(add_button, 1)
         vbox.addStretch(2)
 
+        hbox2 = QHBoxLayout()
+        hbox2.addWidget(back_button)
+        hbox2.addStretch(4)
+
         self.QList = QListWidget()
+        vbox2 = QVBoxLayout()
+        vbox2.addLayout(hbox2)
+        vbox2.addWidget(self.QList)
 
         hbox = QHBoxLayout()
-        hbox.addWidget(self.QList, 7)
+        hbox.addLayout(vbox2, 7)
         hbox.addLayout(vbox, 1)
 
         self.setLayout(hbox)
+
+    def back_button_act(self):
+        alert = QMessageBox().warning(self,"JESTEŚ PEWIEN ??", 'UWAGA !!! \n STRACISZ WPROWADZONE SŁOWA \n JESTEŚ PEWIEN ??', QMessageBox.Yes, QMessageBox.No)
+        if alert == QMessageBox.Yes:
+            self.close()
+            menu_window.show()
 
     def add(self):
         frase1 = text_dialog(self, "FRAZA 1", "  PODAJ PROSZĘ FRAZĘ 1")
