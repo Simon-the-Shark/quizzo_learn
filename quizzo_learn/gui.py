@@ -50,35 +50,39 @@ class WelcomeWindow(QWidget):
 class MyQListWidgetItem(QListWidgetItem):
     """My own QListWidgetItem"""
 
-    def __init__(self, id=0, frase1="", frase2=""):
+    def __init__(self, id=0, frase1="", frase2="", is_empty=False):
         super().__init__()
         self.id = id
         self.frase1 = frase1
         self.frase2 = frase2
+        self.is_empty = is_empty
 
 
 class QItem(QWidget):
     """ a simple widget for MyQListWidgetItem"""
 
-    def __init__(self, frase1, frase2, parent=None):
+    def __init__(self, id, frase1, frase2, parent=None):
         super().__init__()
-        delete_button = QPushButton()
+        self.id = id
+        delete_button = QPushButton("")
         delete_button.setIcon(QIcon(os.path.join(os.pardir, "res", "delete-icon.png")))
-        delete_button.setIconSize(QSize(35, 35))
-        delete_button.resize(10, 10)
+        delete_button.setIconSize(QSize(40, 40))
         delete_button.setStyleSheet("background-color: black;")
-        # delete_button.clicked.connect(self.delt_btn_act)
+        delete_button.clicked.connect(self.delete_button_act)
 
         label1 = QLabel(frase1)
         label2 = QLabel(frase2)
 
         layout = QHBoxLayout()
-        layout.addWidget(label1,5)
-        layout.addWidget(QLabel("="),1)
-        layout.addWidget(label2,5)
+        layout.addWidget(label1, 5)
+        layout.addWidget(QLabel("="), 1)
+        layout.addWidget(label2, 5)
         layout.addWidget(delete_button)
 
         self.setLayout(layout)
+
+    def delete_button_act(self):
+        new_test_window.deleting(self.id)
 
 
 class MenuWindow(QWidget):
@@ -185,13 +189,24 @@ class NewTestWindow(QWidget):
 
         if not (frase1 is None or frase2 is None):
             item = MyQListWidgetItem(self.number_of_frases, frase1, frase2)
-            self.number_of_frases += 1
 
-            widget_item = QItem(frase1, frase2)
+            widget_item = QItem(self.number_of_frases, frase1, frase2)
             item.setSizeHint(widget_item.sizeHint())
+
+            self.number_of_frases += 1
 
             self.QList.addItem(item)
             self.QList.setItemWidget(item, widget_item)
+
+    def deleting(self, id):
+        i = 0
+        i2 = self.QList.count()
+        while i < i2:
+            item = self.QList.item(i)
+            if item.id == id:
+                self.QList.removeItemWidget(item)
+                item.is_empty = False
+            i += 1
 
 
 if __name__ == "__main__":
