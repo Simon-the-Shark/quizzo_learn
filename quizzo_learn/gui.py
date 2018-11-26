@@ -50,10 +50,12 @@ class QItemTest(QWidget):
         self.setLayout(layout)
 
     def button_act(self):
-        pass
+        my_tests_window.close()
+        start_window.label.setText("    " + self.name)
+        start_window.init_ui()
 
     def delete_button_act(self):
-        my_test.deleting(self.name)
+        my_tests_window.deleting(self.name)
 
 
 class QItemQuestion(QWidget):
@@ -140,7 +142,7 @@ class MenuWindow(QWidget):
 
     def mytests_act(self):
         self.close()
-        my_test.init_ui()
+        my_tests_window.init_ui()
 
     def newtest_act(self):
         test_name = text_dialog(self, "NAZWIJ SWÓJ TEST", "PODAJ NAZWĘ TESTU")
@@ -178,7 +180,6 @@ class NewTestWindow(QWidget):
         add_button.clicked.connect(self.add)
 
         OK_button = QPushButton("ZAPISZ I \nROZPOCZNIJ \n TEST")
-        OK_button.setIconSize(QSize(100, 100))
         OK_button.setSizePolicy(QSizePolicy.Expanding,
                                 QSizePolicy.Preferred)
         OK_button.setStyleSheet("background-color: LimeGreen; color:Azure")
@@ -259,6 +260,8 @@ class NewTestWindow(QWidget):
         quizzo_learn.files_interactions.save_test(dir_of_questions,
                                                   os.path.join(os.pardir, "res", "my_tests", self.test_name + ".test"))
         self.close()
+        start_window.label.setText("    " + self.test_name)
+        start_window.init_ui()
 
     def deleting(self, id):
         i = 0
@@ -336,9 +339,84 @@ class MyTest(QWidget):
             i += 1
 
 
+class StartWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
+        self.setWindowTitle("QUIZZO LEARN")
+        self.resize(900, 650)
+        center(self)
+        self.load_ui()
+
+    def init_ui(self):
+        self.show()
+
+    def load_ui(self):
+        box = QVBoxLayout()
+
+        self.label = QLabel()
+        self.label.setFont(QFont("Serif", 15))
+        self.label.setStyleSheet("background-color: darkorange; color:azure; text-align: center")
+
+        back_button = QPushButton("<= WRÓĆ")
+        back_button.setStyleSheet("background-color: YellowGreen; color:Red")
+        back_button.clicked.connect(self.back_button_act)
+        hbox2 = QHBoxLayout()
+        hbox2.addWidget(back_button)
+        hbox2.addStretch(4)
+
+        endless_button = QPushButton("ĆWICZ W NIESKOŃCZONOŚĆ")
+        quizz_button = QPushButton("SPRAWDŻ SIĘ")
+
+        endless_button.setSizePolicy(QSizePolicy.Expanding,
+                                     QSizePolicy.Preferred)
+        quizz_button.setSizePolicy(QSizePolicy.Expanding,
+                                   QSizePolicy.Preferred)
+
+        endless_button.setStyleSheet("background-color: darkorange; color:Azure")
+        quizz_button.setStyleSheet("background-color: darkorange; color:Azure")
+
+        font = QFont("Serif", 20)
+        endless_button.setFont(font)
+        quizz_button.setFont(font)
+
+        endless_button.clicked.connect(self.endless_button_act)
+        quizz_button.clicked.connect(self.quizz_button_act)
+
+        hbox = QHBoxLayout()
+        vbox = QVBoxLayout()
+
+        vbox.addWidget(endless_button, 3)
+        vbox.addStretch(1)
+        vbox.addWidget(quizz_button, 3)
+
+        hbox.addStretch(1)
+        hbox.addLayout(vbox)
+        hbox.addStretch(1)
+
+        box.addWidget(self.label, 2)
+        box.addLayout(hbox2)
+        # box.addStretch(1)
+        box.addLayout(hbox, 5)
+        box.addStretch(2)
+
+        self.setLayout(box)
+
+    def endless_button_act(self):
+        pass
+
+    def quizz_button_act(self):
+        pass
+
+    def back_button_act(self):
+        self.close()
+        menu_window.show()
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     menu_window = MenuWindow()
     new_test_window = NewTestWindow()
-    my_test = MyTest()
+    my_tests_window = MyTest()
+    start_window = StartWindow()
     sys.exit(app.exec_())
