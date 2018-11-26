@@ -6,7 +6,7 @@ from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, \
     QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QGridLayout, QTextEdit
 
-
+import quizzo_learn.files_interactions
 def center(window):
     """ centers window """
     qr = window.frameGeometry()
@@ -159,7 +159,7 @@ class NewTestWindow(QWidget):
         OK_button.setStyleSheet("background-color: LimeGreen; color:Azure")
         font = QFont("Serif", 15)
         OK_button.setFont(font)
-
+        OK_button.clicked.connect(self.save)
 
         vbox = QVBoxLayout()
         vbox.addStretch(2)
@@ -211,7 +211,21 @@ class NewTestWindow(QWidget):
 
         self.QList.addItem(item)
         self.QList.setItemWidget(item, widget_item)
+    def save(self):
+        dir_of_questions = {} #yeah it is something like LIST OF GOD
+        reversed_dir_of_questions = {}
 
+        i = 0
+        i2 = self.QList.count()
+        while i < i2:
+            item = self.QList.item(i)
+            if not item.is_empty:
+                dir_of_questions[item.frase1] = item.frase2
+                reversed_dir_of_questions[item.frase2] = item.frase1
+            i += 1
+
+        quizzo_learn.files_interactions.save_test(self.test_name,dir_of_questions, reversed_dir_of_questions)
+        self.close()
     def deleting(self, id):
         i = 0
         i2 = self.QList.count()
