@@ -262,6 +262,7 @@ class NewTestWindow(QWidget):
         self.close()
         start_window.label.setText("    " + self.test_name)
         start_window.init_ui()
+        my_tests_window.refresh()
 
     def deleting(self, id):
         i = 0
@@ -326,6 +327,16 @@ class MyTest(QWidget):
 
             self.QList.addItem(item)
             self.QList.setItemWidget(item, test_widget)
+
+    def refresh(self):
+        i = 0
+        i2 = self.QList.count()
+        while i < i2:
+            item = self.QList.item(i)
+            self.QList.removeItemWidget(item)
+            i += 1
+
+        self.load_tests()
 
     def deleting(self, name):
         i = 0
@@ -396,7 +407,7 @@ class StartWindow(QWidget):
 
         box.addWidget(self.label, 2)
         box.addLayout(hbox2)
-        # box.addStretch(1)
+        box.addStretch(1)
         box.addLayout(hbox, 5)
         box.addStretch(2)
 
