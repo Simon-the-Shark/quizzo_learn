@@ -36,7 +36,38 @@ class MyQListWidgetItem(QListWidgetItem):
         self.is_empty = is_empty
 
 
-class QItem(QWidget):
+class QItemTest(QWidget):
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+
+        delete_button = QPushButton("")
+        delete_button.setIcon(QIcon(os.path.join(os.pardir, "res", "img", "delete-icon.png")))
+        delete_button.setIconSize(QSize(20, 20))
+        delete_button.setStyleSheet("background-color: grey;")
+        delete_button.clicked.connect(self.delete_button_act)
+
+        layout = QHBoxLayout()
+
+        label = QLabel(name)
+
+        button = QPushButton("ROZWIĄŻ =>")
+        button.setStyleSheet("background-color:LimeGreen; color:azure")
+        button.clicked.connect(self.button_act)
+
+        layout.addWidget(label, 20)
+        layout.addWidget(delete_button, 1)
+        layout.addWidget(button, 3)
+        self.setLayout(layout)
+
+    def button_act(self):
+        pass
+
+    def delete_button_act(self):
+        pass
+
+
+class QItemQuestion(QWidget):
     """ a simple widget for MyQListWidgetItem"""
 
     def __init__(self, id, frase1, frase2, parent=None):
@@ -45,7 +76,7 @@ class QItem(QWidget):
         delete_button = QPushButton("")
         delete_button.setIcon(QIcon(os.path.join(os.pardir, "res", "img", "delete-icon.png")))
         delete_button.setIconSize(QSize(40, 40))
-        delete_button.setStyleSheet("background-color: black;")
+        delete_button.setStyleSheet("background-color: grey;")
         delete_button.clicked.connect(self.delete_button_act)
 
         label1 = QLabel(frase1)
@@ -100,6 +131,7 @@ class MenuWindow(QWidget):
         bigtest_button.setFont(font)
 
         newtest_button.clicked.connect(self.newtest_act)
+        mytests_button.clicked.connect(self.mytests_act)
 
         vbox = QVBoxLayout()
         vbox.addStretch(1)
@@ -116,6 +148,10 @@ class MenuWindow(QWidget):
         hbox.addLayout(vbox, 3)
         hbox.addStretch(1)
         self.setLayout(hbox)
+
+    def mytests_act(self):
+        self.close()
+        my_test.init_ui()
 
     def newtest_act(self):
         test_name = text_dialog(self, "NAZWIJ SWÓJ TEST", "PODAJ NAZWĘ TESTU")
@@ -203,7 +239,7 @@ class NewTestWindow(QWidget):
 
         item = MyQListWidgetItem(self.number_of_frases, frase1, frase2)
 
-        widget_item = QItem(self.number_of_frases, frase1, frase2)
+        widget_item = QItemQuestion(self.number_of_frases, frase1, frase2)
         item.setSizeHint(widget_item.sizeHint())
 
         self.number_of_frases += 1
@@ -227,7 +263,8 @@ class NewTestWindow(QWidget):
             QMessageBox.warning(self, "PUSTE", "NIE DA RADY STWORZYĆ PUSTEGO TESTU !!!", QMessageBox.Ok)
             return None
 
-        quizzo_learn.files_interactions.save_test(self.test_name, dir_of_questions)
+        quizzo_learn.files_interactions.save_test(dir_of_questions,
+                                                  os.path.join(os.pardir, "res", "my_tests", self.test_name + ".test"))
         self.close()
 
     def deleting(self, id):
@@ -244,9 +281,59 @@ class NewTestWindow(QWidget):
 class MyTest(QWidget):
     def __init__(self):
         super().__init__()
+        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
+        self.setWindowTitle("QUIZZO LEARN")
+        self.resize(900, 650)
+        center(self)
+        self.load_ui()
+
+    def init_ui(self):
+        self.show()
+
+    def load_ui(self):
+        box = QVBoxLayout()
+
+        back_button = QPushButton("<= WRÓĆ")
+        back_button.setStyleSheet("background-color: YellowGreen; color:Red")
+        back_button.clicked.connect(self.back_button_act)
+
+        font = QFont("Serif", 20)
+        label = QLabel("MOJE TESTY:")
+        label.setFont(font)
+        label.setStyleSheet("color:azure; background-color:darkorange")
+
+        self.QList = QListWidget()
+
+        hbox2 = QHBoxLayout()
+        hbox2.addWidget(back_button)
+        hbox2.addStretch(4)
+
+        box.addWidget(label, 1)
+        box.addLayout(hbox2, 1)
+        box.addWidget(self.QList, 8)
+
+        self.setLayout(box)
+
+        self.load_tests()
+
+    def back_button_act(self):
+        self.close()
+        menu_window.show()
+
+    def load_tests(self):
+        tests = quizzo_learn.files_interactions.list_of_tests(os.path.join(os.pardir, "res", "my_tests"))
+        for test in tests:
+            item = QListWidgetItem()
+            test_widget = QItemTest(test)
+            item.setSizeHint(test_widget.sizeHint())
+
+            self.QList.addItem(item)
+            self.QList.setItemWidget(item, test_widget)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     menu_window = MenuWindow()
     new_test_window = NewTestWindow()
+    my_test = MyTest()
     sys.exit(app.exec_())
