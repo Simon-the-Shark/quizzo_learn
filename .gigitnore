@@ -103,3 +103,7 @@ ENV/
 #PyCharm shit
 .idea/
 .idea
+
+#tests files
+my_tests/
+/my_tests
