@@ -53,7 +53,7 @@ class QItemTest(QWidget):
         pass
 
     def delete_button_act(self):
-        pass
+        my_test.deleting(self.name)
 
 
 class QItemQuestion(QWidget):
@@ -317,11 +317,23 @@ class MyTest(QWidget):
         tests = quizzo_learn.files_interactions.list_of_tests(os.path.join(os.pardir, "res", "my_tests"))
         for test in tests:
             item = QListWidgetItem()
+            item.name = test
             test_widget = QItemTest(test)
             item.setSizeHint(test_widget.sizeHint())
 
             self.QList.addItem(item)
             self.QList.setItemWidget(item, test_widget)
+
+    def deleting(self, name):
+        i = 0
+        i2 = self.QList.count()
+        while i < i2:
+            item = self.QList.item(i)
+            if item.name == name:
+                self.QList.removeItemWidget(item)
+                quizzo_learn.files_interactions.delete_file(
+                    os.path.join(os.pardir, "res", "my_tests", name + ".test"))
+            i += 1
 
 
 if __name__ == "__main__":

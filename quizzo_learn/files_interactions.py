@@ -16,3 +16,7 @@ def list_of_tests(directory_path):
             if name.endswith(".test"):
                 return_list.append(name[:-5])
     return return_list
+
+
+def delete_file(path):
+    os.remove(path)
