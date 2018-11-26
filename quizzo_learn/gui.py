@@ -25,17 +25,6 @@ def text_dialog(parent, title, question):
         return None
 
 
-class MyQListWidgetItem(QListWidgetItem):
-    """My own QListWidgetItem"""
-
-    def __init__(self, id=0, frase1="", frase2="", is_empty=False):
-        super().__init__()
-        self.id = id
-        self.frase1 = frase1
-        self.frase2 = frase2
-        self.is_empty = is_empty
-
-
 class QItemTest(QWidget):
     def __init__(self, name):
         super().__init__()
@@ -237,7 +226,11 @@ class NewTestWindow(QWidget):
         if frase2 is None:
             return None
 
-        item = MyQListWidgetItem(self.number_of_frases, frase1, frase2)
+        item = QListWidgetItem()
+        item.id = self.number_of_frases
+        item.frase1 = frase1
+        item.frase2 = frase2
+        item.is_empty = False
 
         widget_item = QItemQuestion(self.number_of_frases, frase1, frase2)
         item.setSizeHint(widget_item.sizeHint())
