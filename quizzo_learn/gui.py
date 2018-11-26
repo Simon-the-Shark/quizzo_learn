@@ -55,7 +55,14 @@ class QItemTest(QWidget):
         start_window.init_ui()
 
     def delete_button_act(self):
-        my_tests_window.deleting(self.name)
+        alert = QMessageBox.warning(self, "UWAGA !!!",
+                                    "JESTEŚ PEWIEN, ŻE CHCESZ USUNĄĆ TEN ({}) TEST ???".format(self.name),
+                                    QMessageBox.Yes, QMessageBox.No)
+        if alert == QMessageBox.Yes:
+            input = text_dialog(self, "USUWANIE",
+                                "DLA OCHRONY PRZED POMYŁKAMI PRZEPISZ  NAZWĘ ({}) TESTU".format(self.name))
+            if input == self.name:
+                my_tests_window.deleting(self.name)
 
 
 class QItemQuestion(QWidget):
@@ -165,6 +172,7 @@ class NewTestWindow(QWidget):
     def init_ui(self, test_name):
         self.test_name = test_name
         self.number_of_frases = 0
+        self.QList.clear()
         self.show()
 
     def load_ui(self):
@@ -371,7 +379,7 @@ class StartWindow(QWidget):
         hbox2.addStretch(4)
 
         endless_button = QPushButton("ĆWICZ W NIESKOŃCZONOŚĆ")
-        quizz_button = QPushButton("SPRAWDŻ SIĘ")
+        quizz_button = QPushButton("SPRAWDŹ SIĘ")
 
         endless_button.setSizePolicy(QSizePolicy.Expanding,
                                      QSizePolicy.Preferred)
