@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, 
     QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QGridLayout, QTextEdit
 
 import quizzo_learn.files_interactions
+
+
 def center(window):
     """ centers window """
     qr = window.frameGeometry()
@@ -41,7 +43,7 @@ class QItem(QWidget):
         super().__init__()
         self.id = id
         delete_button = QPushButton("")
-        delete_button.setIcon(QIcon(os.path.join(os.pardir, "res", "delete-icon.png")))
+        delete_button.setIcon(QIcon(os.path.join(os.pardir, "res", "img", "delete-icon.png")))
         delete_button.setIconSize(QSize(40, 40))
         delete_button.setStyleSheet("background-color: black;")
         delete_button.clicked.connect(self.delete_button_act)
@@ -66,7 +68,7 @@ class MenuWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "logo.png")))
+        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
         self.setWindowTitle("QUIZZO LEARN")
         self.resize(900, 650)
         center(self)
@@ -127,7 +129,7 @@ class NewTestWindow(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "logo.png")))
+        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
         self.setWindowTitle("QUIZZO LEARN")
         self.resize(900, 650)
         center(self)
@@ -143,14 +145,12 @@ class NewTestWindow(QWidget):
         back_button.setStyleSheet("background-color: YellowGreen; color:Red")
         back_button.clicked.connect(self.back_button_act)
 
-
         add_button = QPushButton()
-        add_button.setIcon(QIcon(os.path.join(os.pardir, "res", "add-icon.png")))
+        add_button.setIcon(QIcon(os.path.join(os.pardir, "res", "img", "add-icon.png")))
         add_button.setIconSize(QSize(100, 100))
         add_button.setSizePolicy(QSizePolicy.Expanding,
                                  QSizePolicy.Preferred)
         add_button.clicked.connect(self.add)
-
 
         OK_button = QPushButton("ZAPISZ I \nROZPOCZNIJ \n TEST")
         OK_button.setIconSize(QSize(100, 100))
@@ -201,7 +201,6 @@ class NewTestWindow(QWidget):
         if frase2 is None:
             return None
 
-
         item = MyQListWidgetItem(self.number_of_frases, frase1, frase2)
 
         widget_item = QItem(self.number_of_frases, frase1, frase2)
@@ -211,8 +210,9 @@ class NewTestWindow(QWidget):
 
         self.QList.addItem(item)
         self.QList.setItemWidget(item, widget_item)
+
     def save(self):
-        dir_of_questions = {} #yeah it is something like LIST OF GOD
+        dir_of_questions = {}  # yeah it is something like LIST OF GOD
         reversed_dir_of_questions = {}
 
         i = 0
@@ -223,9 +223,13 @@ class NewTestWindow(QWidget):
                 dir_of_questions[item.frase1] = item.frase2
                 reversed_dir_of_questions[item.frase2] = item.frase1
             i += 1
+        if len(dir_of_questions) < 1:
+            QMessageBox.warning(self, "PUSTE", "NIE DA RADY STWORZYĆ PUSTEGO TESTU !!!", QMessageBox.Ok)
+            return None
 
-        quizzo_learn.files_interactions.save_test(self.test_name,dir_of_questions, reversed_dir_of_questions)
+        quizzo_learn.files_interactions.save_test(self.test_name, dir_of_questions)
         self.close()
+
     def deleting(self, id):
         i = 0
         i2 = self.QList.count()
@@ -233,7 +237,7 @@ class NewTestWindow(QWidget):
             item = self.QList.item(i)
             if item.id == id:
                 self.QList.removeItemWidget(item)
-                item.is_empty = False
+                item.is_empty = True
             i += 1
 
 
