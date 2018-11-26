@@ -329,13 +329,7 @@ class MyTest(QWidget):
             self.QList.setItemWidget(item, test_widget)
 
     def refresh(self):
-        i = 0
-        i2 = self.QList.count()
-        while i < i2:
-            item = self.QList.item(i)
-            self.QList.removeItemWidget(item)
-            i += 1
-
+        self.QList.clear()
         self.load_tests()
 
     def deleting(self, name):
