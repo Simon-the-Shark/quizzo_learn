@@ -32,7 +32,7 @@ def read_test(path):
         rows = rows[:-1]
         for row in rows:
             frases = row.split("<#^#^#>")
-            dir_of_questions[frases[0]] = frases[1]
-            reversed_dir_of_questions[frases[1]] = frases[0]
+            dir_of_questions[frases[0]] = str(frases[1])
+            reversed_dir_of_questions[frases[1]] = str(frases[0])
         f.close()
     return [dir_of_questions, reversed_dir_of_questions]

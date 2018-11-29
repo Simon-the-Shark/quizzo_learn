@@ -3,7 +3,7 @@ import os.path
 from random import sample
 
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QFont, QIcon
+from PyQt5.QtGui import QFont, QIcon, QFocusEvent
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, \
     QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QTextEdit
 
@@ -24,6 +24,71 @@ def text_dialog(parent, title, question):
         return text
     else:
         return None
+
+
+class CorrectWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
+        self.setWindowTitle("QUIZZO LEARN")
+        self.resize(900, 650)
+        center(self)
+
+        label = QLabel("DOBRZE !!!\nZDOBYWASZ PUNKT !!!")
+        label.setFont(QFont("serif", 50))
+        label.setAlignment(Qt.AlignCenter)
+        label.setStyleSheet("background-color: green ; color:azure;")
+
+        next_button = QPushButton("NASTĘPNE")
+        next_button.setFont(QFont("serif", 30))
+        next_button.setSizePolicy(QSizePolicy.Expanding,
+                                  QSizePolicy.Preferred)
+        next_button.setStyleSheet("background-color: LimeGreen; color:Azure")
+        next_button.clicked.connect(self.next_button_act)
+
+        box = QVBoxLayout()
+        box.addWidget(label, 9)
+        box.addWidget(next_button, 1)
+
+        self.setLayout(box)
+
+    def init_ui(self):
+        self.show()
+
+    def next_button_act(self):
+        start_window.quizz_control.next_question()
+
+
+class InCorrectWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
+        self.setWindowTitle("QUIZZO LEARN")
+        self.resize(900, 650)
+        center(self)
+
+        label = QLabel("ŹLE :(\nPOPEŁNIŁEŚ BŁĄD :(")
+        label.setFont(QFont("serif", 50))
+        label.setAlignment(Qt.AlignCenter)
+        label.setStyleSheet("background-color: orangered; color:azure;")
+
+        next_button = QPushButton("NASTĘPNE")
+        next_button.setFont(QFont("serif", 30))
+        next_button.setSizePolicy(QSizePolicy.Expanding,
+                                  QSizePolicy.Preferred)
+        next_button.setStyleSheet("background-color: LimeGreen; color:Azure")
+        next_button.clicked.connect(self.next_button_act)
+
+        box = QVBoxLayout()
+        box.addWidget(label, 9)
+        box.addWidget(next_button, 1)
+        self.setLayout(box)
+
+    def init_ui(self):
+        self.show()
+
+    def next_button_act(self):
+        start_window.quizz_control.next_question()
 
 
 class QItemTest(QWidget):
@@ -421,7 +486,8 @@ class StartWindow(QWidget):
         pass
 
     def quizz_button_act(self):
-        quizz_control = QuizControl(self.dirs_of_questions, False)
+        self.close()
+        self.quizz_control = QuizControl(self.dirs_of_questions, False)
 
     def back_button_act(self):
         self.close()
@@ -435,7 +501,7 @@ class QuizWindow(QWidget):
         self.setWindowTitle("QUIZZO LEARN")
         self.resize(900, 650)
         center(self)
-        self.practise = True
+        self.practice = True
         self.load_ui()
 
     def init_ui(self):
@@ -455,6 +521,7 @@ class QuizWindow(QWidget):
                                   QSizePolicy.Preferred)
         next_button.setStyleSheet("background-color: LimeGreen; color:Azure")
         next_button.clicked.connect(self.next_button_act)
+        next_button.setFocus()
 
         button_box = QHBoxLayout()
         button_box.addWidget(back_button, 5)
@@ -467,7 +534,7 @@ class QuizWindow(QWidget):
         self.question.setAlignment(Qt.AlignCenter)
         self.question.setWordWrap(True)
 
-        self.answer = QTextEdit()
+        self.answer = QLineEdit()
         self.answer.setFont(QFont("Serif", 30))
 
         box = QVBoxLayout()
@@ -492,8 +559,22 @@ class QuizWindow(QWidget):
         pass
 
     def next_button_act(self):
-        pass
+        question_text = self.question.text()
+        user_answer = str(self.answer.text())
 
+        self.answer.clear()
+
+        if not self.practice:
+            correct = start_window.quizz_control.check(question_text, user_answer)
+            if correct:
+                start_window.quizz_control.current_points += 1
+                self.close()
+                correct_window.init_ui()
+            else:
+                self.close()
+                incorrect_window.init_ui()
+        else:
+            pass
 
 class QuizControl(object):
     def __init__(self, dirs_of_questions, practice=True):
@@ -501,13 +582,15 @@ class QuizControl(object):
         self.practice = practice
 
         if self.practice:
+            quiz_window.practice = True
             self.start_endless_quiz()
         elif not self.practice:
-            self.max_points = len(self.dir_of_questions)
+            quiz_window.practice = False
+            self.max_points = len(self.dir_of_questions) + len(self.reversed_dir_of_questions)
             self.current_points = 0
             self.start_test()
 
-    def set_questions_queue(self):
+    def mix_questions_queue(self):
         keys_list = self.dir_of_questions.keys()
         reversed_keys_list = self.reversed_dir_of_questions.keys()
         mixed_keys_list = sample(keys_list, len(keys_list))
@@ -529,11 +612,30 @@ class QuizControl(object):
         return queue
 
     def start_test(self):
-        queue = self.set_questions_queue()
-        print(queue)
+        self.queue = self.mix_questions_queue()
+        self.next_question()
 
+    def next_question(self):
+        if len(self.queue) > 0:
+            quiz_window.set_question(self.queue.pop(0))
+            quiz_window.init_ui()
+        else:
+            self.end_test()
+
+    def end_test(self):
+        print(self.current_points)
+        print(self.max_points)
     def start_endless_quiz(self):
         pass
+
+    def check(self, question, answer):
+        if question in self.dir_of_questions:
+            if self.dir_of_questions[question] == answer:
+                return True
+        if question in self.reversed_dir_of_questions:
+            if self.reversed_dir_of_questions[question] == answer:
+                return True
+        return False
 
 
 if __name__ == "__main__":
@@ -543,4 +645,6 @@ if __name__ == "__main__":
     my_tests_window = MyTest()
     start_window = StartWindow()
     quiz_window = QuizWindow()
+    correct_window = CorrectWindow()
+    incorrect_window = InCorrectWindow()
     sys.exit(app.exec_())
