@@ -37,13 +37,13 @@ class CorrectWindow(QWidget):
         label = QLabel("DOBRZE !!!\nZDOBYWASZ PUNKT !!!")
         label.setFont(QFont("serif", 50))
         label.setAlignment(Qt.AlignCenter)
-        label.setStyleSheet("background-color: green ; color:azure;")
+        label.setStyleSheet("background-color: green ; color:AntiqueWhite;")
 
         next_button = QPushButton("NASTĘPNE")
         next_button.setFont(QFont("serif", 30))
         next_button.setSizePolicy(QSizePolicy.Expanding,
                                   QSizePolicy.Preferred)
-        next_button.setStyleSheet("background-color: LimeGreen; color:Azure")
+        next_button.setStyleSheet("background-color: LimeGreen; color:AntiqueWhite")
         next_button.clicked.connect(self.next_button_act)
 
         box = QVBoxLayout()
@@ -56,6 +56,7 @@ class CorrectWindow(QWidget):
         self.show()
 
     def next_button_act(self):
+        self.close()
         start_window.quizz_control.next_question()
 
 
@@ -70,13 +71,13 @@ class InCorrectWindow(QWidget):
         label = QLabel("ŹLE :(\nPOPEŁNIŁEŚ BŁĄD :(")
         label.setFont(QFont("serif", 50))
         label.setAlignment(Qt.AlignCenter)
-        label.setStyleSheet("background-color: orangered; color:azure;")
+        label.setStyleSheet("background-color: orangered; color:AntiqueWhite;")
 
         next_button = QPushButton("NASTĘPNE")
         next_button.setFont(QFont("serif", 30))
         next_button.setSizePolicy(QSizePolicy.Expanding,
                                   QSizePolicy.Preferred)
-        next_button.setStyleSheet("background-color: LimeGreen; color:Azure")
+        next_button.setStyleSheet("background-color: LimeGreen; color:AntiqueWhite")
         next_button.clicked.connect(self.next_button_act)
 
         box = QVBoxLayout()
@@ -88,9 +89,68 @@ class InCorrectWindow(QWidget):
         self.show()
 
     def next_button_act(self):
+        self.close()
         start_window.quizz_control.next_question()
 
 
+class RatingWindow(QWidget):
+    def __init__(self, points=0, max_points=1):
+        super().__init__()
+        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
+        self.setWindowTitle("QUIZZO LEARN")
+        self.resize(900, 650)
+        center(self)
+
+        self.points = points
+        self.max_points = max_points
+
+        self.load_ui()
+
+    def init_ui(self, points, max_points):
+        self.points = points
+        self.max_points = max_points
+
+        proc = self.points / self.max_points * 100
+        self.label_punkty.setText("ZDOBYŁEŚ\n {} / {} \nPUNKTÓW".format(self.points, self.max_points))
+        self.label_procenty.setText("TO {}%".format(str(proc)))
+
+        self.show()
+
+    def load_ui(self):
+        box = QVBoxLayout()
+
+        self.label_procenty = QLabel()
+        self.label_punkty = QLabel()
+
+        self.label_punkty.setStyleSheet(
+            "background-color: darkorange; color:AntiqueWhite;")
+        self.label_punkty.setAlignment(Qt.AlignCenter)
+        self.label_punkty.setWordWrap(True)
+        self.label_punkty.setFont(QFont("serif", 40))
+
+        self.label_procenty.setStyleSheet(
+            "background-color: darkorange; color:AntiqueWhite;")
+        self.label_procenty.setAlignment(Qt.AlignCenter)
+        self.label_procenty.setWordWrap(True)
+        self.label_procenty.setFont(QFont("serif", 40))
+
+        end_button = QPushButton("ZAKOŃCZ TEST")
+        end_button.setFont(QFont("serif", 30))
+        end_button.setSizePolicy(QSizePolicy.Expanding,
+                                 QSizePolicy.Preferred)
+        end_button.setStyleSheet("background-color: forestgreen; color:AntiqueWhite")
+        end_button.clicked.connect(self.end_button_act)
+
+        box.addWidget(self.label_punkty, 4)
+        box.addWidget(self.label_procenty, 4)
+        box.addWidget(end_button, 1)
+
+        self.setLayout(box)
+
+    def end_button_act(self):
+        del start_window.quizz_control
+        self.close()
+        menu_window.init_ui()
 class QItemTest(QWidget):
     def __init__(self, name):
         super().__init__()
@@ -107,7 +167,7 @@ class QItemTest(QWidget):
         label = QLabel(name)
 
         button = QPushButton("ROZWIĄŻ =>")
-        button.setStyleSheet("background-color:LimeGreen; color:azure")
+        button.setStyleSheet("background-color:LimeGreen; color:AntiqueWhite")
         button.clicked.connect(self.button_act)
 
         layout.addWidget(label, 20)
@@ -183,9 +243,9 @@ class MenuWindow(QWidget):
         bigtest_button.setSizePolicy(QSizePolicy.Expanding,
                                      QSizePolicy.Preferred)
 
-        mytests_button.setStyleSheet("background-color: DarkOrange; color:Azure")
-        newtest_button.setStyleSheet("background-color: DarkOrange; color:Azure")
-        bigtest_button.setStyleSheet("background-color: DarkOrange; color:Azure")
+        mytests_button.setStyleSheet("background-color: DarkOrange; color:AntiqueWhite")
+        newtest_button.setStyleSheet("background-color: DarkOrange; color:AntiqueWhite")
+        bigtest_button.setStyleSheet("background-color: DarkOrange; color:AntiqueWhite")
 
         font = QFont("Serif", 20)
         mytests_button.setFont(font)
@@ -254,7 +314,7 @@ class NewTestWindow(QWidget):
         OK_button = QPushButton("ZAPISZ I \nROZPOCZNIJ \n TEST")
         OK_button.setSizePolicy(QSizePolicy.Expanding,
                                 QSizePolicy.Preferred)
-        OK_button.setStyleSheet("background-color: LimeGreen; color:Azure")
+        OK_button.setStyleSheet("background-color: LimeGreen; color:AntiqueWhite")
         font = QFont("Serif", 15)
         OK_button.setFont(font)
         OK_button.clicked.connect(self.save)
@@ -362,7 +422,7 @@ class MyTest(QWidget):
         font = QFont("Serif", 20)
         label = QLabel("MOJE TESTY:")
         label.setFont(font)
-        label.setStyleSheet("color:azure; background-color:darkorange")
+        label.setStyleSheet("color:AntiqueWhite; background-color:darkorange")
 
         self.QList = QListWidget()
 
@@ -434,7 +494,7 @@ class StartWindow(QWidget):
 
         self.label = QLabel()
         self.label.setFont(QFont("Serif", 25))
-        self.label.setStyleSheet("background-color: darkorange; color:azure; text-align: center")
+        self.label.setStyleSheet("background-color: darkorange; color:AntiqueWhite; text-align: center")
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setWordWrap(True)
 
@@ -453,8 +513,8 @@ class StartWindow(QWidget):
         quizz_button.setSizePolicy(QSizePolicy.Expanding,
                                    QSizePolicy.Preferred)
 
-        endless_button.setStyleSheet("background-color: darkorange; color:Azure")
-        quizz_button.setStyleSheet("background-color: darkorange; color:Azure")
+        endless_button.setStyleSheet("background-color: darkorange; color:AntiqueWhite")
+        quizz_button.setStyleSheet("background-color: darkorange; color:AntiqueWhite")
 
         font = QFont("Serif", 20)
         endless_button.setFont(font)
@@ -519,7 +579,7 @@ class QuizWindow(QWidget):
         next_button.setFont(QFont("serif", 30))
         next_button.setSizePolicy(QSizePolicy.Expanding,
                                   QSizePolicy.Preferred)
-        next_button.setStyleSheet("background-color: LimeGreen; color:Azure")
+        next_button.setStyleSheet("background-color: LimeGreen; color:AntiqueWhite")
         next_button.clicked.connect(self.next_button_act)
         next_button.setFocus()
 
@@ -530,7 +590,7 @@ class QuizWindow(QWidget):
 
         self.question = QLabel()
         self.question.setStyleSheet(
-            "background-color: darkorange; color:azure;")
+            "background-color: darkorange; color:AntiqueWhite;")
         self.question.setAlignment(Qt.AlignCenter)
         self.question.setWordWrap(True)
 
@@ -575,6 +635,7 @@ class QuizWindow(QWidget):
                 incorrect_window.init_ui()
         else:
             pass
+
 
 class QuizControl(object):
     def __init__(self, dirs_of_questions, practice=True):
@@ -623,8 +684,8 @@ class QuizControl(object):
             self.end_test()
 
     def end_test(self):
-        print(self.current_points)
-        print(self.max_points)
+        rating_window.init_ui(self.current_points, self.max_points)
+
     def start_endless_quiz(self):
         pass
 
@@ -647,4 +708,5 @@ if __name__ == "__main__":
     quiz_window = QuizWindow()
     correct_window = CorrectWindow()
     incorrect_window = InCorrectWindow()
+    rating_window = RatingWindow()
     sys.exit(app.exec_())
