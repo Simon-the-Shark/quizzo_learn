@@ -50,9 +50,7 @@ class QItemTest(QWidget):
         self.setLayout(layout)
 
     def button_act(self):
-        my_tests_window.close()
-        start_window.label.setText("    " + self.name)
-        start_window.init_ui()
+        my_tests_window.start_test(self.name)
 
     def delete_button_act(self):
         alert = QMessageBox.warning(self, "UWAGA !!!",
@@ -262,7 +260,7 @@ class NewTestWindow(QWidget):
                                                   os.path.join(os.pardir, "res", "my_tests", self.test_name + ".test"))
         self.close()
         start_window.label.setText("    " + self.test_name)
-        start_window.init_ui()
+        start_window.init_ui([dir_of_questions, reversed_dir_of_questions])
         my_tests_window.refresh()
 
     def deleting(self, id):
@@ -344,6 +342,13 @@ class MyTest(QWidget):
                     os.path.join(os.pardir, "res", "my_tests", name + ".test"))
             i += 1
 
+    def start_test(self, name):
+        dirs_of_questions = quizzo_learn.files_interactions.read_test(
+            os.path.join(os.pardir, "res", "my_tests", name + ".test"))
+        self.close()
+        start_window.label.setText("    " + name)
+        start_window.init_ui(dirs_of_questions)
+
 
 class StartWindow(QWidget):
     def __init__(self):
@@ -354,7 +359,8 @@ class StartWindow(QWidget):
         center(self)
         self.load_ui()
 
-    def init_ui(self):
+    def init_ui(self, dirs_of_questions):
+        self.dirs_of_questions = dirs_of_questions
         self.show()
 
     def load_ui(self):
@@ -486,6 +492,11 @@ class QuizWindow(QWidget):
 
     def next_button_act(self):
         pass
+
+
+class QuizControl(object):
+    def __init__(self, practice=True):
+        self.practice = practice
 
 
 if __name__ == "__main__":

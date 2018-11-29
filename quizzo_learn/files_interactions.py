@@ -2,9 +2,9 @@ import os.path
 
 
 def save_test(dir, path):
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding="utf-8") as f:
         for frase1 in dir:
-            string_to_save = frase1 + "^&^&^&9&^&^&^$#$&^&#@$!" + dir[frase1] + '\n'
+            string_to_save = frase1 + "<#^#^#>" + dir[frase1] + '\n'
             f.write(string_to_save)
         f.close()
 
@@ -20,3 +20,18 @@ def list_of_tests(directory_path):
 
 def delete_file(path):
     os.remove(path)
+
+
+def read_test(path):
+    dir_of_questions = {}
+    reversed_dir_of_questions = {}
+
+    with open(path, "r", encoding="utf-8") as f:
+        rows = f.split("\n")
+        for row in rows:
+            frases = row.split("<#^#^#>")
+            dir_of_questions[frases[0]] = frases[1]
+            reversed_dir_of_questions[frases[1]] = frases[0]
+    f.close()
+
+    return [dir_of_questions, reversed_dir_of_questions]
