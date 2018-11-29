@@ -1,7 +1,7 @@
 import sys
 import os.path
 
-from PyQt5.QtCore import QSize
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, \
     QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QGridLayout, QTextEdit
@@ -177,7 +177,7 @@ class NewTestWindow(QWidget):
 
     def load_ui(self):
         back_button = QPushButton("<= WRÓĆ")
-        back_button.setStyleSheet("background-color: YellowGreen; color:Red")
+        back_button.setStyleSheet("background-color: YellowGreen; color:purple")
         back_button.clicked.connect(self.back_button_act)
 
         add_button = QPushButton()
@@ -227,13 +227,13 @@ class NewTestWindow(QWidget):
     def add(self):
         frase1 = text_dialog(self, "FRAZA 1", "  PODAJ PROSZĘ FRAZĘ 1")
 
-        if frase1 is None:
-            return None
+        # if frase1 is None:
+        #     return None
 
         frase2 = text_dialog(self, "FRAZA 2", "  PODAJ PROSZĘ FRAZĘ 2")
 
-        if frase2 is None:
-            return None
+        # if frase2 is None:
+        #     return None
 
         item = QListWidgetItem()
         item.id = self.number_of_frases
@@ -299,7 +299,7 @@ class MyTest(QWidget):
         box = QVBoxLayout()
 
         back_button = QPushButton("<= WRÓĆ")
-        back_button.setStyleSheet("background-color: YellowGreen; color:Red")
+        back_button.setStyleSheet("background-color: YellowGreen; color:purple")
         back_button.clicked.connect(self.back_button_act)
 
         font = QFont("Serif", 20)
@@ -368,11 +368,13 @@ class StartWindow(QWidget):
         box = QVBoxLayout()
 
         self.label = QLabel()
-        self.label.setFont(QFont("Serif", 15))
+        self.label.setFont(QFont("Serif", 25))
         self.label.setStyleSheet("background-color: darkorange; color:azure; text-align: center")
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setWordWrap(True)
 
         back_button = QPushButton("<= WRÓĆ")
-        back_button.setStyleSheet("background-color: YellowGreen; color:Red")
+        back_button.setStyleSheet("background-color: YellowGreen; color:purple")
         back_button.clicked.connect(self.back_button_act)
         hbox2 = QHBoxLayout()
         hbox2.addWidget(back_button)
@@ -419,11 +421,79 @@ class StartWindow(QWidget):
         pass
 
     def quizz_button_act(self):
-        pass
+        quiz_window.init_ui()
 
     def back_button_act(self):
         self.close()
         menu_window.show()
+
+
+class QuizWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
+        self.setWindowTitle("QUIZZO LEARN")
+        self.resize(900, 650)
+        center(self)
+        self.load_ui()
+
+    def init_ui(self):
+        self.show()
+
+    def load_ui(self):
+        back_button = QPushButton("<= ZAKOŃCZ")
+        back_button.setFont(QFont("serif", 30))
+        back_button.setStyleSheet("background-color: YellowGreen; color:purple")
+        back_button.setSizePolicy(QSizePolicy.Expanding,
+                                  QSizePolicy.Preferred)
+        back_button.clicked.connect(self.back_button_act)
+
+        next_button = QPushButton("DALEJ =>")
+        next_button.setFont(QFont("serif", 30))
+        next_button.setSizePolicy(QSizePolicy.Expanding,
+                                  QSizePolicy.Preferred)
+        next_button.setStyleSheet("background-color: LimeGreen; color:Azure")
+        next_button.clicked.connect(self.next_button_act)
+
+        button_box = QHBoxLayout()
+        button_box.addWidget(back_button, 5)
+        button_box.addStretch(3)
+        button_box.addWidget(next_button, 5)
+
+        self.question = QLabel()
+        self.question.setStyleSheet(
+            "background-color: darkorange; color:azure;")
+        self.question.setAlignment(Qt.AlignCenter)
+        self.question.setWordWrap(True)
+
+        self.answer = QTextEdit()
+        self.answer.setFont(QFont("Serif", 30))
+
+        box = QVBoxLayout()
+
+        box.addWidget(self.question, 5)
+        box.addWidget(self.answer, 3)
+        box.addLayout(button_box, 1)
+
+        self.setLayout(box)
+
+        self.set_question("das Auto     xd")
+
+    def set_question(self, new_q):
+        if len(new_q) <= 15:
+            self.question.setFont(QFont("serif", 55))
+        elif len(new_q) <= 30:
+            self.question.setFont(QFont("serif", 35))
+        else:
+            self.question.setFont(QFont("serif", 20))
+
+        self.question.setText(new_q)
+
+    def back_button_act(self):
+        pass
+
+    def next_button_act(self):
+        pass
 
 
 if __name__ == "__main__":
@@ -432,4 +502,5 @@ if __name__ == "__main__":
     new_test_window = NewTestWindow()
     my_tests_window = MyTest()
     start_window = StartWindow()
+    quiz_window = QuizWindow()
     sys.exit(app.exec_())
