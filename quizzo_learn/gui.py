@@ -4,7 +4,7 @@ import os.path
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, \
-    QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QGridLayout, QTextEdit
+    QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QTextEdit
 
 import quizzo_learn.files_interactions
 
@@ -68,7 +68,7 @@ class QItemTest(QWidget):
 class QItemQuestion(QWidget):
     """ a simple widget for MyQListWidgetItem"""
 
-    def __init__(self, id, frase1, frase2, parent=None):
+    def __init__(self, id, frase1, frase2):
         super().__init__()
         self.id = id
         delete_button = QPushButton("")
@@ -218,7 +218,7 @@ class NewTestWindow(QWidget):
 
     def back_button_act(self):
         alert = QMessageBox().warning(self, "JESTEŚ PEWIEN ??",
-                                      'UWAGA !!! \n STRACISZ WPROWADZONE SŁOWA \n JESTEŚ PEWIEN ??', QMessageBox.Yes,
+                                      "UWAGA !!! \n STRACISZ WPROWADZONE SŁOWA \n JESTEŚ PEWIEN ??", QMessageBox.Yes,
                                       QMessageBox.No)
         if alert == QMessageBox.Yes:
             self.close()
@@ -226,14 +226,7 @@ class NewTestWindow(QWidget):
 
     def add(self):
         frase1 = text_dialog(self, "FRAZA 1", "  PODAJ PROSZĘ FRAZĘ 1")
-
-        # if frase1 is None:
-        #     return None
-
         frase2 = text_dialog(self, "FRAZA 2", "  PODAJ PROSZĘ FRAZĘ 2")
-
-        # if frase2 is None:
-        #     return None
 
         item = QListWidgetItem()
         item.id = self.number_of_frases
@@ -421,7 +414,7 @@ class StartWindow(QWidget):
         pass
 
     def quizz_button_act(self):
-        quiz_window.init_ui()
+        pass
 
     def back_button_act(self):
         self.close()
@@ -435,6 +428,7 @@ class QuizWindow(QWidget):
         self.setWindowTitle("QUIZZO LEARN")
         self.resize(900, 650)
         center(self)
+        self.practise = True
         self.load_ui()
 
     def init_ui(self):
@@ -476,8 +470,6 @@ class QuizWindow(QWidget):
         box.addLayout(button_box, 1)
 
         self.setLayout(box)
-
-        self.set_question("das Auto     xd")
 
     def set_question(self, new_q):
         if len(new_q) <= 15:
