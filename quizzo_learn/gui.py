@@ -1,5 +1,6 @@
 import sys
 import os.path
+from random import sample
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon
@@ -420,7 +421,7 @@ class StartWindow(QWidget):
         pass
 
     def quizz_button_act(self):
-        pass
+        quizz_control = QuizControl(self.dirs_of_questions, False)
 
     def back_button_act(self):
         self.close()
@@ -495,8 +496,44 @@ class QuizWindow(QWidget):
 
 
 class QuizControl(object):
-    def __init__(self, practice=True):
+    def __init__(self, dirs_of_questions, practice=True):
+        self.dir_of_questions, self.reversed_dir_of_questions = dirs_of_questions
         self.practice = practice
+
+        if self.practice:
+            self.start_endless_quiz()
+        elif not self.practice:
+            self.max_points = len(self.dir_of_questions)
+            self.current_points = 0
+            self.start_test()
+
+    def set_questions_queue(self):
+        keys_list = self.dir_of_questions.keys()
+        reversed_keys_list = self.reversed_dir_of_questions.keys()
+        mixed_keys_list = sample(keys_list, len(keys_list))
+        mixed_reversed_keys_list = sample(reversed_keys_list, len(reversed_keys_list))
+
+        queue = []
+        while len(mixed_keys_list) > 0:
+            queue.append(mixed_keys_list[0])
+
+            if not self.dir_of_questions[mixed_keys_list[0]] == mixed_reversed_keys_list[0]:
+                queue.append(mixed_reversed_keys_list.pop(0))
+            elif len(mixed_keys_list) == 1:
+                queue.append(mixed_reversed_keys_list.pop(0))
+            else:
+                queue.append(mixed_reversed_keys_list.pop())
+                mixed_reversed_keys_list[len(mixed_reversed_keys_list) - 1] = mixed_reversed_keys_list[0]
+
+            trash = mixed_keys_list.pop(0)
+        return queue
+
+    def start_test(self):
+        queue = self.set_questions_queue()
+        print(queue)
+
+    def start_endless_quiz(self):
+        pass
 
 
 if __name__ == "__main__":
