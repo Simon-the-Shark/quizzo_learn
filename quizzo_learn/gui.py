@@ -41,6 +41,7 @@ class CorrectWindow(QWidget):
         self.label.setStyleSheet("background-color: green ; color:AntiqueWhite;")
 
         next_button = QPushButton("NASTĘPNE")
+        next_button.setDefault(True)
         next_button.setFont(QFont("serif", 30))
         next_button.setSizePolicy(QSizePolicy.Expanding,
                                   QSizePolicy.Preferred)
@@ -86,6 +87,7 @@ class InCorrectWindow(QWidget):
 
         next_button = QPushButton("NASTĘPNE")
         next_button.setFont(QFont("serif", 30))
+        next_button.setDefault(True)
         next_button.setSizePolicy(QSizePolicy.Expanding,
                                   QSizePolicy.Preferred)
         next_button.setStyleSheet("background-color: LimeGreen; color:AntiqueWhite")
