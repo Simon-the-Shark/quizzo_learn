@@ -578,8 +578,9 @@ class StartWindow(QWidget):
         self.close()
 
         correct_window.practice = False
-        correct_window.set_label_if_practice(self)
+        correct_window.set_label_if_practice()
         incorrect_window.practice = False
+        incorrect_window.set_label_if_practice()
 
         self.quizz_control = QuizControl(self.dirs_of_questions, False)
 
