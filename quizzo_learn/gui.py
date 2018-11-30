@@ -600,6 +600,7 @@ class QuizWindow(QWidget):
         self.load_ui()
 
     def init_ui(self):
+        self.answer.setFocus()
         self.show()
 
     def load_ui(self):
@@ -616,7 +617,6 @@ class QuizWindow(QWidget):
                                   QSizePolicy.Preferred)
         next_button.setStyleSheet("background-color: LimeGreen; color:AntiqueWhite")
         next_button.clicked.connect(self.next_button_act)
-        next_button.setFocus()
 
         button_box = QHBoxLayout()
         button_box.addWidget(back_button, 5)
@@ -631,7 +631,7 @@ class QuizWindow(QWidget):
 
         self.answer = QLineEdit()
         self.answer.setFont(QFont("Serif", 30))
-
+        self.answer.returnPressed.connect(self.next_button_act)
         box = QVBoxLayout()
 
         box.addWidget(self.question, 5)
