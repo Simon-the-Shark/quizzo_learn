@@ -27,17 +27,18 @@ def text_dialog(parent, title, question):
 
 
 class CorrectWindow(QWidget):
-    def __init__(self):
+    def __init__(self, practice=False):
         super().__init__()
+        self.practice = practice
         self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
         self.setWindowTitle("QUIZZO LEARN")
         self.resize(900, 650)
         center(self)
 
-        label = QLabel("DOBRZE !!!\nZDOBYWASZ PUNKT !!!")
-        label.setFont(QFont("serif", 50))
-        label.setAlignment(Qt.AlignCenter)
-        label.setStyleSheet("background-color: green ; color:AntiqueWhite;")
+        self.label = QLabel("DOBRZE !!!\nZDOBYWASZ PUNKT !!!")
+        self.label.setFont(QFont("serif", 50))
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setStyleSheet("background-color: green ; color:AntiqueWhite;")
 
         next_button = QPushButton("NASTĘPNE")
         next_button.setFont(QFont("serif", 30))
@@ -47,7 +48,7 @@ class CorrectWindow(QWidget):
         next_button.clicked.connect(self.next_button_act)
 
         box = QVBoxLayout()
-        box.addWidget(label, 9)
+        box.addWidget(self.label, 9)
         box.addWidget(next_button, 1)
 
         self.setLayout(box)
@@ -57,21 +58,31 @@ class CorrectWindow(QWidget):
 
     def next_button_act(self):
         self.close()
-        start_window.quizz_control.next_question()
+        if self.practice:
+            start_window.quizz_control.next_endless_question()
+        else:
+            start_window.quizz_control.next_question()
+
+    def set_label_if_practice(self):
+        if not self.practice:
+            self.label.setText("DOBRZE !!!\nZDOBYWASZ PUNKT !!!")
+        else:
+            self.label.setText("DOBRZE !!!")
 
 
 class InCorrectWindow(QWidget):
-    def __init__(self):
+    def __init__(self, practice=False):
         super().__init__()
+        self.practice = practice
         self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
         self.setWindowTitle("QUIZZO LEARN")
         self.resize(900, 650)
         center(self)
 
-        label = QLabel("ŹLE :(\nPOPEŁNIŁEŚ BŁĄD :(")
-        label.setFont(QFont("serif", 50))
-        label.setAlignment(Qt.AlignCenter)
-        label.setStyleSheet("background-color: orangered; color:AntiqueWhite;")
+        self.label = QLabel("ŹLE :(\nPOPEŁNIŁEŚ BŁĄD :(")
+        self.label.setFont(QFont("serif", 50))
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setStyleSheet("background-color: orangered; color:AntiqueWhite;")
 
         next_button = QPushButton("NASTĘPNE")
         next_button.setFont(QFont("serif", 30))
@@ -81,7 +92,7 @@ class InCorrectWindow(QWidget):
         next_button.clicked.connect(self.next_button_act)
 
         box = QVBoxLayout()
-        box.addWidget(label, 9)
+        box.addWidget(self.label, 9)
         box.addWidget(next_button, 1)
         self.setLayout(box)
 
@@ -90,7 +101,16 @@ class InCorrectWindow(QWidget):
 
     def next_button_act(self):
         self.close()
-        start_window.quizz_control.next_question()
+        if self.practice:
+            start_window.quizz_control.next_endless_question()
+        else:
+            start_window.quizz_control.next_question()
+
+    def set_label_if_practice(self, good_answer=""):
+        if self.practice:
+            self.label.setText("ŹLE :(\nPOPEŁNIŁEŚ BŁĄD :(\nPOPRAWNA ODPOWIEDZ TO\n{}".format(good_answer))
+        else:
+            self.label.setText("ŹLE :(\nPOPEŁNIŁEŚ BŁĄD :(")
 
 
 class RatingWindow(QWidget):
@@ -151,6 +171,8 @@ class RatingWindow(QWidget):
         del start_window.quizz_control
         self.close()
         menu_window.init_ui()
+
+
 class QItemTest(QWidget):
     def __init__(self, name):
         super().__init__()
@@ -543,10 +565,22 @@ class StartWindow(QWidget):
         self.setLayout(box)
 
     def endless_button_act(self):
-        pass
+        self.close()
+
+        correct_window.practice = True
+        correct_window.set_label_if_practice()
+        incorrect_window.practice = True
+        incorrect_window.set_label_if_practice()
+
+        self.quizz_control = QuizControl(self.dirs_of_questions, True)
 
     def quizz_button_act(self):
         self.close()
+
+        correct_window.practice = False
+        correct_window.set_label_if_practice(self)
+        incorrect_window.practice = False
+
         self.quizz_control = QuizControl(self.dirs_of_questions, False)
 
     def back_button_act(self):
@@ -624,17 +658,17 @@ class QuizWindow(QWidget):
 
         self.answer.clear()
 
-        if not self.practice:
-            correct = start_window.quizz_control.check(question_text, user_answer)
-            if correct:
+        correct, good_answer = start_window.quizz_control.check(question_text, user_answer)
+        if correct:
+            if not self.practice:
                 start_window.quizz_control.current_points += 1
-                self.close()
-                correct_window.init_ui()
-            else:
-                self.close()
-                incorrect_window.init_ui()
+            self.close()
+            correct_window.init_ui()
         else:
-            pass
+            if self.practice:
+                incorrect_window.set_label_if_practice(good_answer)
+            self.close()
+            incorrect_window.init_ui()
 
 
 class QuizControl(object):
@@ -663,7 +697,7 @@ class QuizControl(object):
 
             if not self.dir_of_questions[mixed_keys_list[0]] == mixed_reversed_keys_list[0]:
                 queue.append(mixed_reversed_keys_list.pop(0))
-            elif len(mixed_keys_list) == 1:
+            elif len(mixed_reversed_keys_list) == 1:
                 queue.append(mixed_reversed_keys_list.pop(0))
             else:
                 queue.append(mixed_reversed_keys_list.pop())
@@ -676,6 +710,10 @@ class QuizControl(object):
         self.queue = self.mix_questions_queue()
         self.next_question()
 
+    def start_endless_quiz(self):
+        self.queue = self.mix_questions_queue()
+        self.next_endless_question()
+
     def next_question(self):
         if len(self.queue) > 0:
             quiz_window.set_question(self.queue.pop(0))
@@ -683,20 +721,30 @@ class QuizControl(object):
         else:
             self.end_test()
 
-    def end_test(self):
-        rating_window.init_ui(self.current_points, self.max_points)
-
-    def start_endless_quiz(self):
-        pass
+    def next_endless_question(self):
+        if len(self.queue) > 0:
+            quiz_window.set_question(self.queue.pop(0))
+            quiz_window.init_ui()
+        else:
+            self.queue = self.mix_questions_queue()
+            self.next_endless_question()
 
     def check(self, question, answer):
         if question in self.dir_of_questions:
             if self.dir_of_questions[question] == answer:
-                return True
+                return [True, ""]
+            else:
+                good_answer = self.dir_of_questions[question]
+                return [False, good_answer]
         if question in self.reversed_dir_of_questions:
             if self.reversed_dir_of_questions[question] == answer:
-                return True
-        return False
+                return [True, ""]
+            else:
+                good_answer = self.reversed_dir_of_questions[question]
+                return [False, good_answer]
+
+    def end_test(self):
+        rating_window.init_ui(self.current_points, self.max_points)
 
 
 if __name__ == "__main__":
