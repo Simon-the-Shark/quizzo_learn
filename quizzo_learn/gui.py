@@ -134,7 +134,7 @@ class RatingWindow(QWidget):
 
         proc = self.points / self.max_points * 100
         self.label_punkty.setText("ZDOBYŁEŚ\n {} / {} \nPUNKTÓW".format(self.points, self.max_points))
-        self.label_procenty.setText("TO {}%".format(str(proc)))
+        self.label_procenty.setText("TO {}%".format(str(proc)[:5]))
 
         self.show()
 
@@ -750,6 +750,40 @@ class QuizControl(object):
         rating_window.init_ui(self.current_points, self.max_points)
 
 
+def set_background_colors():
+    p = menu_window.palette()
+    p.setColor(menu_window.backgroundRole(), Qt.lightGray)
+    menu_window.setPalette(p)
+
+    p = new_test_window.palette()
+    p.setColor(new_test_window.backgroundRole(), Qt.lightGray)
+    new_test_window.setPalette(p)
+
+    p = my_tests_window.palette()
+    p.setColor(my_tests_window.backgroundRole(), Qt.lightGray)
+    my_tests_window.setPalette(p)
+
+    p = start_window.palette()
+    p.setColor(start_window.backgroundRole(), Qt.lightGray)
+    start_window.setPalette(p)
+
+    p = quiz_window.palette()
+    p.setColor(quiz_window.backgroundRole(), Qt.lightGray)
+    quiz_window.setPalette(p)
+
+    p = correct_window.palette()
+    p.setColor(correct_window.backgroundRole(), Qt.lightGray)
+    correct_window.setPalette(p)
+
+    p = incorrect_window.palette()
+    p.setColor(incorrect_window.backgroundRole(), Qt.lightGray)
+    incorrect_window.setPalette(p)
+
+    p = rating_window.palette()
+    p.setColor(rating_window.backgroundRole(), Qt.lightGray)
+    rating_window.setPalette(p)
+
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     menu_window = MenuWindow()
@@ -760,4 +794,5 @@ if __name__ == "__main__":
     correct_window = CorrectWindow()
     incorrect_window = InCorrectWindow()
     rating_window = RatingWindow()
+    set_background_colors()
     sys.exit(app.exec_())
