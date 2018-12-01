@@ -354,6 +354,8 @@ class NewTestWindow(QWidget):
         hbox2.addStretch(4)
 
         self.QList = QListWidget()
+        self.QList.setStyleSheet("background-color:PeachPuff ")
+
         vbox2 = QVBoxLayout()
         vbox2.addLayout(hbox2)
         vbox2.addWidget(self.QList)
@@ -374,7 +376,13 @@ class NewTestWindow(QWidget):
 
     def add(self):
         frase1 = text_dialog(self, "FRAZA 1", "  PODAJ PROSZĘ FRAZĘ 1")
+        if frase1 is None:
+            QMessageBox.warning(self, "PUSTE", "Prosze podać jakąś fraze", QMessageBox.Ok)
+            return None
         frase2 = text_dialog(self, "FRAZA 2", "  PODAJ PROSZĘ FRAZĘ 2")
+        if frase2 is None:
+            QMessageBox.warning(self, "PUSTE", "Prosze podać jakąś fraze", QMessageBox.Ok)
+            return None
 
         item = QListWidgetItem()
         item.id = self.number_of_frases
@@ -449,6 +457,7 @@ class MyTest(QWidget):
         label.setStyleSheet("color:AntiqueWhite; background-color:darkorange")
 
         self.QList = QListWidget()
+        self.QList.setStyleSheet("background-color:PeachPuff ")
 
         hbox2 = QHBoxLayout()
         hbox2.addWidget(back_button)
@@ -634,6 +643,7 @@ class QuizWindow(QWidget):
         self.answer = QLineEdit()
         self.answer.setFont(QFont("Serif", 30))
         self.answer.returnPressed.connect(self.next_button_act)
+        self.answer.setStyleSheet("background-color:PapayaWhip")
         box = QVBoxLayout()
 
         box.addWidget(self.question, 5)
