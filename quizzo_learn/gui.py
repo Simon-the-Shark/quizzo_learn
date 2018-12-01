@@ -278,6 +278,7 @@ class MenuWindow(QWidget):
 
         newtest_button.clicked.connect(self.newtest_act)
         mytests_button.clicked.connect(self.mytests_act)
+        bigtest_button.clicked.connect(self.bigtest_act)
 
         vbox = QVBoxLayout()
         vbox.addStretch(1)
@@ -304,6 +305,10 @@ class MenuWindow(QWidget):
         if test_name is not None:
             self.close()
             new_test_window.init_ui(test_name)
+
+    def bigtest_act(self):
+        self.close()
+        build_big_test_window.init_ui()
 
 
 class NewTestWindow(QWidget):
@@ -815,6 +820,62 @@ def set_background_colors():
     p.setColor(rating_window.backgroundRole(), Qt.lightGray)
     rating_window.setPalette(p)
 
+    p = build_big_test_window.palette()
+    p.setColor(build_big_test_window.backgroundRole(), Qt.lightGray)
+    build_big_test_window.setPalette(p)
+
+
+class BuildBigTest(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
+        self.setWindowTitle("QUIZZO LEARN")
+        self.resize(900, 650)
+        center(self)
+        self.load_ui()
+
+    def init_ui(self):
+        self.show()
+
+    def load_ui(self):
+        label = QLabel("Wybierz testy, aby zbudować duży sprawdzian")
+        label.setFont(QFont("serif", 30))
+        label.setAlignment(Qt.AlignCenter)
+        label.setWordWrap(True)
+        label.setStyleSheet("background-color:darkorange;color:AntiqueWhite")
+
+        back_button = QPushButton("<= WRÓĆ")
+        back_button.setStyleSheet("background-color: YellowGreen; color:purple")
+        back_button.clicked.connect(self.back_button_act)
+        back_box = QHBoxLayout()
+        back_box.addWidget(back_button)
+        back_box.addStretch(4)
+
+        self.QList = QListWidget()
+        self.QList.setStyleSheet("background-color:PeachPuff")
+
+        next_button = QPushButton("ROZPOCZNIJ SPRAWDZIAN =>")
+        next_button.setFont(QFont("serif", 30))
+        next_button.setSizePolicy(QSizePolicy.Expanding,
+                                  QSizePolicy.Preferred)
+        next_button.setStyleSheet("background-color: LimeGreen; color:AntiqueWhite")
+        next_button.clicked.connect(self.next_button_act)
+
+        box = QVBoxLayout()
+        box.addWidget(label, 3)
+        box.addLayout(back_box, 1)
+        box.addWidget(self.QList, 20)
+        box.addWidget(next_button, 3)
+
+        self.setLayout(box)
+
+    def next_button_act(self):
+        pass
+
+    def back_button_act(self):
+        self.close()
+        menu_window.init_ui()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -826,5 +887,6 @@ if __name__ == "__main__":
     correct_window = CorrectWindow()
     incorrect_window = InCorrectWindow()
     rating_window = RatingWindow()
+    build_big_test_window = BuildBigTest()
     set_background_colors()
     sys.exit(app.exec_())
