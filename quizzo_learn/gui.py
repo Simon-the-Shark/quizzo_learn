@@ -720,17 +720,25 @@ class QuizControl(object):
 
         queue = []
         while len(mixed_keys_list) > 0:
-            queue.append(mixed_keys_list[0])
+            if len(mixed_keys_list) == 1 or len(queue) == 0:
+                added = mixed_keys_list.pop(0)
+                queue.append(added)
+            elif not self.dir_of_questions[mixed_keys_list[0]] == queue[len(queue) - 1]:
+                added = mixed_keys_list.pop(0)
+                queue.append(added)
+            else:
+                added = mixed_keys_list.pop()
+                queue.append(added)
 
-            if not self.dir_of_questions[mixed_keys_list[0]] == mixed_reversed_keys_list[0]:
+            if not mixed_reversed_keys_list[0] == self.dir_of_questions[added]:
                 queue.append(mixed_reversed_keys_list.pop(0))
             elif len(mixed_reversed_keys_list) == 1:
                 queue.append(mixed_reversed_keys_list.pop(0))
             else:
                 queue.append(mixed_reversed_keys_list.pop())
-                mixed_reversed_keys_list[len(mixed_reversed_keys_list) - 1] = mixed_reversed_keys_list[0]
+                thing_to_flip = mixed_reversed_keys_list.pop(0)
+                mixed_reversed_keys_list.append(thing_to_flip)
 
-            trash = mixed_keys_list.pop(0)
         return queue
 
     def start_test(self):
