@@ -1,6 +1,5 @@
 import sys
 import os.path
-from random import sample
 
 from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QFont, QIcon, QFocusEvent
@@ -8,6 +7,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, 
     QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QTextEdit
 
 import quizzo_learn.files_interactions
+from quizzo_learn.QuizControl import QuizControl, give_globals
 
 
 def center(window):
@@ -24,6 +24,44 @@ def text_dialog(parent, title, question):
         return text
     else:
         return None
+
+
+def set_background_colors():
+    p = menu_window.palette()
+    p.setColor(menu_window.backgroundRole(), Qt.lightGray)
+    menu_window.setPalette(p)
+
+    p = new_test_window.palette()
+    p.setColor(new_test_window.backgroundRole(), Qt.lightGray)
+    new_test_window.setPalette(p)
+
+    p = my_tests_window.palette()
+    p.setColor(my_tests_window.backgroundRole(), Qt.lightGray)
+    my_tests_window.setPalette(p)
+
+    p = start_window.palette()
+    p.setColor(start_window.backgroundRole(), Qt.lightGray)
+    start_window.setPalette(p)
+
+    p = quiz_window.palette()
+    p.setColor(quiz_window.backgroundRole(), Qt.lightGray)
+    quiz_window.setPalette(p)
+
+    p = correct_window.palette()
+    p.setColor(correct_window.backgroundRole(), Qt.lightGray)
+    correct_window.setPalette(p)
+
+    p = incorrect_window.palette()
+    p.setColor(incorrect_window.backgroundRole(), Qt.lightGray)
+    incorrect_window.setPalette(p)
+
+    p = rating_window.palette()
+    p.setColor(rating_window.backgroundRole(), Qt.lightGray)
+    rating_window.setPalette(p)
+
+    p = build_big_test_window.palette()
+    p.setColor(build_big_test_window.backgroundRole(), Qt.lightGray)
+    build_big_test_window.setPalette(p)
 
 
 class CorrectWindow(QWidget):
@@ -702,129 +740,6 @@ class QuizWindow(QWidget):
             self.close()
             incorrect_window.init_ui()
 
-
-class QuizControl(object):
-    def __init__(self, dirs_of_questions, practice=True):
-        self.dir_of_questions, self.reversed_dir_of_questions = dirs_of_questions
-        self.practice = practice
-
-        if self.practice:
-            quiz_window.practice = True
-            self.start_endless_quiz()
-        elif not self.practice:
-            quiz_window.practice = False
-            self.max_points = len(self.dir_of_questions) + len(self.reversed_dir_of_questions)
-            self.current_points = 0
-            self.start_test()
-
-    def mix_questions_queue(self):
-        keys_list = self.dir_of_questions.keys()
-        reversed_keys_list = self.reversed_dir_of_questions.keys()
-        mixed_keys_list = sample(keys_list, len(keys_list))
-        mixed_reversed_keys_list = sample(reversed_keys_list, len(reversed_keys_list))
-
-        queue = []
-        while len(mixed_keys_list) > 0:
-            if len(mixed_keys_list) == 1 or len(queue) == 0:
-                added = mixed_keys_list.pop(0)
-                queue.append(added)
-            elif not self.dir_of_questions[mixed_keys_list[0]] == queue[len(queue) - 1]:
-                added = mixed_keys_list.pop(0)
-                queue.append(added)
-            else:
-                added = mixed_keys_list.pop()
-                queue.append(added)
-
-            if not mixed_reversed_keys_list[0] == self.dir_of_questions[added]:
-                queue.append(mixed_reversed_keys_list.pop(0))
-            elif len(mixed_reversed_keys_list) == 1:
-                queue.append(mixed_reversed_keys_list.pop(0))
-            else:
-                queue.append(mixed_reversed_keys_list.pop())
-                thing_to_flip = mixed_reversed_keys_list.pop(0)
-                mixed_reversed_keys_list.append(thing_to_flip)
-
-        return queue
-
-    def start_test(self):
-        self.queue = self.mix_questions_queue()
-        self.next_question()
-
-    def start_endless_quiz(self):
-        self.queue = self.mix_questions_queue()
-        self.next_endless_question()
-
-    def next_question(self):
-        if len(self.queue) > 0:
-            quiz_window.set_question(self.queue.pop(0))
-            quiz_window.init_ui()
-        else:
-            self.end_test()
-
-    def next_endless_question(self):
-        if len(self.queue) > 0:
-            quiz_window.set_question(self.queue.pop(0))
-            quiz_window.init_ui()
-        else:
-            self.queue = self.mix_questions_queue()
-            self.next_endless_question()
-
-    def check(self, question, answer):
-        if question in self.dir_of_questions:
-            if self.dir_of_questions[question] == answer:
-                return [True, ""]
-            else:
-                good_answer = self.dir_of_questions[question]
-                return [False, good_answer]
-        if question in self.reversed_dir_of_questions:
-            if self.reversed_dir_of_questions[question] == answer:
-                return [True, ""]
-            else:
-                good_answer = self.reversed_dir_of_questions[question]
-                return [False, good_answer]
-
-    def end_test(self):
-        rating_window.init_ui(self.current_points, self.max_points)
-
-
-def set_background_colors():
-    p = menu_window.palette()
-    p.setColor(menu_window.backgroundRole(), Qt.lightGray)
-    menu_window.setPalette(p)
-
-    p = new_test_window.palette()
-    p.setColor(new_test_window.backgroundRole(), Qt.lightGray)
-    new_test_window.setPalette(p)
-
-    p = my_tests_window.palette()
-    p.setColor(my_tests_window.backgroundRole(), Qt.lightGray)
-    my_tests_window.setPalette(p)
-
-    p = start_window.palette()
-    p.setColor(start_window.backgroundRole(), Qt.lightGray)
-    start_window.setPalette(p)
-
-    p = quiz_window.palette()
-    p.setColor(quiz_window.backgroundRole(), Qt.lightGray)
-    quiz_window.setPalette(p)
-
-    p = correct_window.palette()
-    p.setColor(correct_window.backgroundRole(), Qt.lightGray)
-    correct_window.setPalette(p)
-
-    p = incorrect_window.palette()
-    p.setColor(incorrect_window.backgroundRole(), Qt.lightGray)
-    incorrect_window.setPalette(p)
-
-    p = rating_window.palette()
-    p.setColor(rating_window.backgroundRole(), Qt.lightGray)
-    rating_window.setPalette(p)
-
-    p = build_big_test_window.palette()
-    p.setColor(build_big_test_window.backgroundRole(), Qt.lightGray)
-    build_big_test_window.setPalette(p)
-
-
 class BuildBigTest(QWidget):
     def __init__(self):
         super().__init__()
@@ -879,6 +794,7 @@ class BuildBigTest(QWidget):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
     menu_window = MenuWindow()
     new_test_window = NewTestWindow()
     my_tests_window = MyTest()
@@ -888,5 +804,8 @@ if __name__ == "__main__":
     incorrect_window = InCorrectWindow()
     rating_window = RatingWindow()
     build_big_test_window = BuildBigTest()
+    give_globals(quiz_window, rating_window)
+
     set_background_colors()
+
     sys.exit(app.exec_())
