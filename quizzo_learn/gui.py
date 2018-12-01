@@ -417,7 +417,7 @@ class NewTestWindow(QWidget):
         quizzo_learn.files_interactions.save_test(dir_of_questions,
                                                   os.path.join(os.pardir, "res", "my_tests", self.test_name + ".test"))
         self.close()
-        start_window.label.setText("    " + self.test_name)
+        start_window.label.setText(self.test_name)
         start_window.init_ui([dir_of_questions, reversed_dir_of_questions])
         my_tests_window.refresh()
 
@@ -505,7 +505,7 @@ class MyTest(QWidget):
         dirs_of_questions = quizzo_learn.files_interactions.read_test(
             os.path.join(os.pardir, "res", "my_tests", name + ".test"))
         self.close()
-        start_window.label.setText("    " + name)
+        start_window.label.setText(name)
         start_window.init_ui(dirs_of_questions)
 
 
@@ -663,7 +663,21 @@ class QuizWindow(QWidget):
         self.question.setText(new_q)
 
     def back_button_act(self):
-        pass
+        if self.practice:
+            are_you_sure = QMessageBox.question(self, "Zakończyć ?", "Jesteś pewien, że chcesz zakończyć trening?",
+                                                QMessageBox.Yes, QMessageBox.No)
+        else:
+            are_you_sure = QMessageBox.warning(self, "Zakończyć?", "Jesteś pewien, że chcesz przerwać w trakcie??",
+                                               QMessageBox.Yes, QMessageBox.No)
+
+        if are_you_sure == QMessageBox.Yes:
+            dirs_of_questions = [start_window.quizz_control.dir_of_questions,
+                                 start_window.quizz_control.reversed_dir_of_questions]
+            del start_window.quizz_control
+            self.close()
+            start_window.init_ui(dirs_of_questions)
+        else:
+            return None
 
     def next_button_act(self):
         question_text = self.question.text()
