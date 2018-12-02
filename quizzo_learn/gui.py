@@ -1,3 +1,9 @@
+# coding=utf-8
+"""
+quizzo_learn gui
+allows user to create, manage his own tests and practise with them
+"""
+
 import sys
 import os.path
 
@@ -27,6 +33,7 @@ def text_dialog(parent, title, question):
 
 
 def set_background_colors():
+    """ sets colors of windows """
     p = menu_window.palette()
     p.setColor(menu_window.backgroundRole(), Qt.lightGray)
     menu_window.setPalette(p)
@@ -65,6 +72,8 @@ def set_background_colors():
 
 
 class CorrectWindow(QWidget):
+    """ shows up, when user`s answer is good """
+
     def __init__(self, practice=False):
         super().__init__()
         self.practice = practice
@@ -110,6 +119,8 @@ class CorrectWindow(QWidget):
 
 
 class InCorrectWindow(QWidget):
+    """ shows up, when user`s answer is wrong """
+
     def __init__(self, practice=False):
         super().__init__()
         self.practice = practice
@@ -154,6 +165,8 @@ class InCorrectWindow(QWidget):
 
 
 class RatingWindow(QWidget):
+    """ shows user`s results """
+
     def __init__(self, points=0, max_points=1):
         super().__init__()
         self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
@@ -214,6 +227,8 @@ class RatingWindow(QWidget):
 
 
 class QItemTest(QWidget):
+    """ simple widget for QListWidgetItem (MyTestsWindow) """
+
     def __init__(self, name):
         super().__init__()
         self.name = name
@@ -252,7 +267,7 @@ class QItemTest(QWidget):
 
 
 class QItemQuestion(QWidget):
-    """ a simple widget for MyQListWidgetItem"""
+    """ a simple widget for QListWidgetItem (NewTestWindow) """
 
     def __init__(self, id, frase1, frase2):
         super().__init__()
@@ -279,6 +294,8 @@ class QItemQuestion(QWidget):
 
 
 class QItemTestModule(QWidget):
+    """ a simple widget for QListWidgetItem (BuildBigTestWindow) """
+
     def __init__(self, name, item):
         super().__init__()
         self.name = name
@@ -303,7 +320,7 @@ class QItemTestModule(QWidget):
 
 
 class MenuWindow(QWidget):
-    """main menu"""
+    """ main menu """
 
     def __init__(self):
         super().__init__()
@@ -374,7 +391,7 @@ class MenuWindow(QWidget):
 
 
 class NewTestWindow(QWidget):
-    """ adding new test"""
+    """ allows to create a new test """
 
     def __init__(self):
         super().__init__()
@@ -466,26 +483,26 @@ class NewTestWindow(QWidget):
         self.QList.setItemWidget(item, widget_item)
 
     def save(self):
-        dir_of_questions = {}  # yeah it is something like LIST OF GOD
-        reversed_dir_of_questions = {}
+        dict_of_questions = {}  # yeah it is something like LIST OF GOD
+        reversed_dict_of_questions = {}
 
         i = 0
         i2 = self.QList.count()
         while i < i2:
             item = self.QList.item(i)
             if not item.is_empty:
-                dir_of_questions[item.frase1] = item.frase2
-                reversed_dir_of_questions[item.frase2] = item.frase1
+                dict_of_questions[item.frase1] = item.frase2
+                reversed_dict_of_questions[item.frase2] = item.frase1
             i += 1
-        if len(dir_of_questions) < 1:
+        if len(dict_of_questions) < 1:
             QMessageBox.warning(self, "PUSTE", "NIE DA RADY STWORZYĆ PUSTEGO TESTU !!!", QMessageBox.Ok)
             return None
 
-        quizzo_learn.files_interactions.save_test(dir_of_questions,
+        quizzo_learn.files_interactions.save_test(dict_of_questions,
                                                   os.path.join(os.pardir, "res", "my_tests", self.test_name + ".test"))
         self.close()
         start_window.label.setText(self.test_name)
-        start_window.init_ui([dir_of_questions, reversed_dir_of_questions])
+        start_window.init_ui([dict_of_questions, reversed_dict_of_questions])
         my_tests_window.refresh()
         build_big_test_window.refresh()
 
@@ -500,7 +517,9 @@ class NewTestWindow(QWidget):
             i += 1
 
 
-class MyTest(QWidget):
+class MyTestsWindow(QWidget):
+    """ shows the list of user`s tests """
+
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
@@ -572,14 +591,16 @@ class MyTest(QWidget):
             i += 1
 
     def start_test(self, name):
-        dirs_of_questions = quizzo_learn.files_interactions.read_test(
+        dicts_of_questions = quizzo_learn.files_interactions.read_test(
             os.path.join(os.pardir, "res", "my_tests", name + ".test"))
         self.close()
         start_window.label.setText(name)
-        start_window.init_ui(dirs_of_questions)
+        start_window.init_ui(dicts_of_questions)
 
 
 class StartWindow(QWidget):
+    """ window with choice of user`s test mode """
+
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
@@ -588,8 +609,8 @@ class StartWindow(QWidget):
         center(self)
         self.load_ui()
 
-    def init_ui(self, dirs_of_questions):
-        self.dirs_of_questions = dirs_of_questions
+    def init_ui(self, dicts_of_questions):
+        self.dicts_of_questions = dicts_of_questions
         self.show()
 
     def load_ui(self):
@@ -653,7 +674,7 @@ class StartWindow(QWidget):
         incorrect_window.practice = True
         incorrect_window.set_label_if_practice()
 
-        self.quizz_control = QuizControl(self.dirs_of_questions, True)
+        self.quizz_control = QuizControl(self.dicts_of_questions, True)
 
     def quizz_button_act(self):
         self.close()
@@ -663,7 +684,7 @@ class StartWindow(QWidget):
         incorrect_window.practice = False
         incorrect_window.set_label_if_practice()
 
-        self.quizz_control = QuizControl(self.dirs_of_questions, False)
+        self.quizz_control = QuizControl(self.dicts_of_questions, False)
 
     def back_button_act(self):
         self.close()
@@ -671,6 +692,8 @@ class StartWindow(QWidget):
 
 
 class QuizWindow(QWidget):
+    """ shows question and gets answer """
+
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
@@ -741,11 +764,11 @@ class QuizWindow(QWidget):
                                                QMessageBox.Yes, QMessageBox.No)
 
         if are_you_sure == QMessageBox.Yes:
-            dirs_of_questions = [start_window.quizz_control.dir_of_questions,
-                                 start_window.quizz_control.reversed_dir_of_questions]
+            dicts_of_questions = [start_window.quizz_control.dict_of_questions,
+                                  start_window.quizz_control.reversed_dict_of_questions]
             del start_window.quizz_control
             self.close()
-            start_window.init_ui(dirs_of_questions)
+            start_window.init_ui(dicts_of_questions)
         else:
             return None
 
@@ -769,6 +792,8 @@ class QuizWindow(QWidget):
 
 
 class BuildBigTestWindow(QWidget):
+    """ allows to create a big test by combining user`s tests """
+
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
@@ -841,26 +866,24 @@ class BuildBigTestWindow(QWidget):
         self.start_big_test(checked_items_list)
 
     def start_big_test(self, items_list):
-        big_dir_of_questions = {}
-        big_rev_dir_of_questions = {}
+        big_dict_of_questions = {}
+        big_rev_dict_of_questions = {}
         items_names = [item.name for item in items_list]
 
         for test_name in items_names:
-            dir, reversed_dir = quizzo_learn.files_interactions.read_test(
+            dict, reversed_dict = quizzo_learn.files_interactions.read_test(
                 os.path.join(os.pardir, "res", "my_tests", test_name + ".test"))
-            big_dir_of_questions.update(dir)
-            big_rev_dir_of_questions.update(reversed_dir)
+            big_dict_of_questions.update(dict)
+            big_rev_dict_of_questions.update(reversed_dict)
 
         big_name = str(items_names)[1:-1]
         start_window.label.setText(big_name)
 
-        big_dirs_of_questions = [big_dir_of_questions, big_rev_dir_of_questions]
+        big_dicts_of_questions = [big_dict_of_questions, big_rev_dict_of_questions]
         for item in items_list:
             item.widget.check_box.setChecked(False)
-        start_window.init_ui(big_dirs_of_questions)
+        start_window.init_ui(big_dicts_of_questions)
         self.close()
-
-
 
     def back_button_act(self):
         self.close()
@@ -872,7 +895,7 @@ if __name__ == "__main__":
 
     menu_window = MenuWindow()
     new_test_window = NewTestWindow()
-    my_tests_window = MyTest()
+    my_tests_window = MyTestsWindow()
     start_window = StartWindow()
     quiz_window = QuizWindow()
     correct_window = CorrectWindow()

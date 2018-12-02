@@ -1,9 +1,15 @@
+# coding=utf-8
+"""
+quizzo_learn QuizControl
+controls queue of questions
+"""
+
 from random import sample
 
 
 class QuizControl(object):
-    def __init__(self, dirs_of_questions, practice=True):
-        self.dir_of_questions, self.reversed_dir_of_questions = dirs_of_questions
+    def __init__(self, dicts_of_questions, practice=True):
+        self.dict_of_questions, self.reversed_dict_of_questions = dicts_of_questions
         self.practice = practice
 
         if self.practice:
@@ -11,13 +17,13 @@ class QuizControl(object):
             self.start_endless_quiz()
         elif not self.practice:
             quiz_window.practice = False
-            self.max_points = len(self.dir_of_questions) + len(self.reversed_dir_of_questions)
+            self.max_points = len(self.dict_of_questions) + len(self.reversed_dict_of_questions)
             self.current_points = 0
             self.start_test()
 
     def mix_questions_queue(self):
-        keys_list = self.dir_of_questions.keys()
-        reversed_keys_list = self.reversed_dir_of_questions.keys()
+        keys_list = self.dict_of_questions.keys()
+        reversed_keys_list = self.reversed_dict_of_questions.keys()
         mixed_keys_list = sample(keys_list, len(keys_list))
         mixed_reversed_keys_list = sample(reversed_keys_list, len(reversed_keys_list))
 
@@ -26,14 +32,14 @@ class QuizControl(object):
             if len(mixed_keys_list) == 1 or len(queue) == 0:
                 added = mixed_keys_list.pop(0)
                 queue.append(added)
-            elif not self.dir_of_questions[mixed_keys_list[0]] == queue[len(queue) - 1]:
+            elif not self.dict_of_questions[mixed_keys_list[0]] == queue[len(queue) - 1]:
                 added = mixed_keys_list.pop(0)
                 queue.append(added)
             else:
                 added = mixed_keys_list.pop()
                 queue.append(added)
 
-            if not mixed_reversed_keys_list[0] == self.dir_of_questions[added]:
+            if not mixed_reversed_keys_list[0] == self.dict_of_questions[added]:
                 queue.append(mixed_reversed_keys_list.pop(0))
             elif len(mixed_reversed_keys_list) == 1:
                 queue.append(mixed_reversed_keys_list.pop(0))
@@ -68,17 +74,17 @@ class QuizControl(object):
             self.next_endless_question()
 
     def check(self, question, answer):
-        if question in self.dir_of_questions:
-            if self.dir_of_questions[question] == answer:
+        if question in self.dict_of_questions:
+            if self.dict_of_questions[question] == answer:
                 return [True, ""]
             else:
-                good_answer = self.dir_of_questions[question]
+                good_answer = self.dict_of_questions[question]
                 return [False, good_answer]
-        if question in self.reversed_dir_of_questions:
-            if self.reversed_dir_of_questions[question] == answer:
+        if question in self.reversed_dict_of_questions:
+            if self.reversed_dict_of_questions[question] == answer:
                 return [True, ""]
             else:
-                good_answer = self.reversed_dir_of_questions[question]
+                good_answer = self.reversed_dict_of_questions[question]
                 return [False, good_answer]
 
     def end_test(self):
