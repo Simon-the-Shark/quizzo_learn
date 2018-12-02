@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, 
     QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QCheckBox
 
 import quizzo_learn.files_interactions
-from quizzo_learn.QuizControl import QuizControl, give_globals
+from quizzo_learn.QuizControl import QuizControl
 
 
 def center(window):
@@ -879,7 +879,7 @@ if __name__ == "__main__":
     incorrect_window = InCorrectWindow()
     rating_window = RatingWindow()
     build_big_test_window = BuildBigTestWindow()
-    give_globals(quiz_window, rating_window)
+    QuizControl.give_globals(quiz_window, rating_window)
 
     set_background_colors()
 

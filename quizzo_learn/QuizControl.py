@@ -1,12 +1,6 @@
 from random import sample
 
 
-def give_globals(quiz_w, rating_w):
-    global quiz_window, rating_window
-    quiz_window = quiz_w
-    rating_window = rating_w
-
-
 class QuizControl(object):
     def __init__(self, dirs_of_questions, practice=True):
         self.dir_of_questions, self.reversed_dir_of_questions = dirs_of_questions
@@ -89,3 +83,9 @@ class QuizControl(object):
 
     def end_test(self):
         rating_window.init_ui(self.current_points, self.max_points)
+
+    @staticmethod
+    def give_globals(quiz_w, rating_w):
+        global quiz_window, rating_window
+        quiz_window = quiz_w
+        rating_window = rating_w
