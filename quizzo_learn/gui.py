@@ -2,9 +2,9 @@ import sys
 import os.path
 
 from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QFont, QIcon, QFocusEvent
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QApplication, QWidget, QDesktopWidget, QHBoxLayout, QVBoxLayout, QPushButton, QLabel, \
-    QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QTextEdit
+    QSizePolicy, QListWidget, QListWidgetItem, QInputDialog, QLineEdit, QMessageBox, QCheckBox
 
 import quizzo_learn.files_interactions
 from quizzo_learn.QuizControl import QuizControl, give_globals
@@ -278,6 +278,30 @@ class QItemQuestion(QWidget):
         new_test_window.deleting(self.id)
 
 
+class QItemTestModule(QWidget):
+    def __init__(self, name, item):
+        super().__init__()
+        self.name = name
+        self.item = item
+
+        hbox = QHBoxLayout()
+        self.check_box = QCheckBox()
+        label = QLabel(name)
+
+        self.check_box.stateChanged.connect(self.change_state)
+
+        hbox.addStretch(1)
+        hbox.addWidget(self.check_box, 4)
+        hbox.addWidget(label, 40)
+
+        self.setLayout(hbox)
+
+        self.change_state()
+
+    def change_state(self):
+        self.item.state = self.check_box.checkState()
+
+
 class MenuWindow(QWidget):
     """main menu"""
 
@@ -463,6 +487,7 @@ class NewTestWindow(QWidget):
         start_window.label.setText(self.test_name)
         start_window.init_ui([dir_of_questions, reversed_dir_of_questions])
         my_tests_window.refresh()
+        build_big_test_window.refresh()
 
     def deleting(self, id):
         i = 0
@@ -542,6 +567,8 @@ class MyTest(QWidget):
                 self.QList.removeItemWidget(item)
                 quizzo_learn.files_interactions.delete_file(
                     os.path.join(os.pardir, "res", "my_tests", name + ".test"))
+                build_big_test_window.refresh()
+                break
             i += 1
 
     def start_test(self, name):
@@ -740,7 +767,8 @@ class QuizWindow(QWidget):
             self.close()
             incorrect_window.init_ui()
 
-class BuildBigTest(QWidget):
+
+class BuildBigTestWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowIcon(QIcon(os.path.join(os.pardir, "res", "img", "logo.png")))
@@ -748,9 +776,26 @@ class BuildBigTest(QWidget):
         self.resize(900, 650)
         center(self)
         self.load_ui()
+        self.load_tests()
 
     def init_ui(self):
         self.show()
+
+    def refresh(self):
+        self.QList.clear()
+        self.load_tests()
+
+    def load_tests(self):
+        tests_list = quizzo_learn.files_interactions.list_of_tests(os.path.join(os.pardir, "res", "my_tests"))
+        for test in tests_list:
+            item = QListWidgetItem()
+            item.name = test
+            widget_item = QItemTestModule(test, item)
+            item.setSizeHint(widget_item.sizeHint())
+            item.widget = widget_item
+
+            self.QList.addItem(item)
+            self.QList.setItemWidget(item, widget_item)
 
     def load_ui(self):
         label = QLabel("Wybierz testy, aby zbudować duży sprawdzian")
@@ -785,7 +830,37 @@ class BuildBigTest(QWidget):
         self.setLayout(box)
 
     def next_button_act(self):
-        pass
+        checked_items_list = []
+        i = 0
+        i2 = self.QList.count()
+        while i < i2:
+            item = self.QList.item(i)
+            if item.state:
+                checked_items_list.append(item)
+            i += 1
+        self.start_big_test(checked_items_list)
+
+    def start_big_test(self, items_list):
+        big_dir_of_questions = {}
+        big_rev_dir_of_questions = {}
+        items_names = [item.name for item in items_list]
+
+        for test_name in items_names:
+            dir, reversed_dir = quizzo_learn.files_interactions.read_test(
+                os.path.join(os.pardir, "res", "my_tests", test_name + ".test"))
+            big_dir_of_questions.update(dir)
+            big_rev_dir_of_questions.update(reversed_dir)
+
+        big_name = str(items_names)[1:-1]
+        start_window.label.setText(big_name)
+
+        big_dirs_of_questions = [big_dir_of_questions, big_rev_dir_of_questions]
+        for item in items_list:
+            item.widget.check_box.setChecked(False)
+        start_window.init_ui(big_dirs_of_questions)
+        self.close()
+
+
 
     def back_button_act(self):
         self.close()
@@ -803,7 +878,7 @@ if __name__ == "__main__":
     correct_window = CorrectWindow()
     incorrect_window = InCorrectWindow()
     rating_window = RatingWindow()
-    build_big_test_window = BuildBigTest()
+    build_big_test_window = BuildBigTestWindow()
     give_globals(quiz_window, rating_window)
 
     set_background_colors()
