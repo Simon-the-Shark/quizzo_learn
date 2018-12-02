@@ -863,6 +863,10 @@ class BuildBigTestWindow(QWidget):
             if item.state:
                 checked_items_list.append(item)
             i += 1
+
+        if not len(checked_items_list) > 0:
+            QMessageBox.warning(self, "PUSTE", "Nie możesz stworzyć pustego testu !", QMessageBox.Ok)
+            return None
         self.start_big_test(checked_items_list)
 
     def start_big_test(self, items_list):
